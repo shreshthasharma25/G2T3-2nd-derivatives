@@ -43,91 +43,100 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {user?.role === 'handler' ? (
-              <>
-                <Link 
-                  to="/handler/dashboard" 
-                  className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/dashboard') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
-                >
-                  <Home className="w-4 h-4" /> Home
-                </Link>
-                
-                <Link 
-                  to="/handler/categories" 
-                  className={`text-sm font-medium transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-md ${isHandlerActive('/handler/categories') ? 'bg-amber-600 text-white font-bold shadow-sm' : 'text-slate-200 hover:text-white hover:bg-slate-800'}`}
-                >
-                  <Layers className="w-4 h-4" /> Categories
-                </Link>
-                
-                <Link 
-                  to="/handler/assigned" 
-                  className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/assigned') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
-                >
-                  <CheckSquare className="w-4 h-4" /> My Assigned
-                </Link>
-                
-                <Link 
-                  to="/handler/urgency-map" 
-                  className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/urgency-map') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
-                >
-                  <MapPin className="w-4 h-4" /> Map
-                </Link>
-                
-                <Link 
-                  to="/handler/resolved" 
-                  className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/resolved') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
-                >
-                  <CheckCircle className="w-4 h-4" /> Resolved
-                </Link>
-                
-                <Link 
-                  to="/handler/priority-queue" 
-                  className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/priority-queue') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
-                >
-                  <BarChart3 className="w-4 h-4" /> Analytics
-                </Link>
+          {user?.role === 'citizen' ? (
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Link 
+                to="/citizen/profile" 
+                aria-label="Profile"
+                className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 p-2 sm:p-0"
+              >
+                <User className="h-5 w-5" />
+                <span className="hidden sm:inline">Profile</span>
+              </Link>
+              <button 
+                onClick={handleSignOut} 
+                aria-label="Sign out"
+                className="flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-800 p-2 sm:p-0 ml-2 sm:ml-4"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Desktop Navigation */}
+              <nav className="hidden md:flex items-center space-x-6">
+                {user?.role === 'handler' ? (
+                  <>
+                    <Link 
+                      to="/handler/dashboard" 
+                      className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/dashboard') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
+                    >
+                      <Home className="w-4 h-4" /> Home
+                    </Link>
+                    
+                    <Link 
+                      to="/handler/categories" 
+                      className={`text-sm font-medium transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-md ${isHandlerActive('/handler/categories') ? 'bg-amber-600 text-white font-bold shadow-sm' : 'text-slate-200 hover:text-white hover:bg-slate-800'}`}
+                    >
+                      <Layers className="w-4 h-4" /> Categories
+                    </Link>
+                    
+                    <Link 
+                      to="/handler/assigned" 
+                      className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/assigned') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
+                    >
+                      <CheckSquare className="w-4 h-4" /> My Assigned
+                    </Link>
+                    
+                    <Link 
+                      to="/handler/urgency-map" 
+                      className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/urgency-map') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
+                    >
+                      <MapPin className="w-4 h-4" /> Map
+                    </Link>
+                    
+                    <Link 
+                      to="/handler/resolved" 
+                      className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/resolved') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
+                    >
+                      <CheckCircle className="w-4 h-4" /> Resolved
+                    </Link>
+                    
+                    <Link 
+                      to="/handler/priority-queue" 
+                      className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${isHandlerActive('/handler/priority-queue') ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'}`}
+                    >
+                      <BarChart3 className="w-4 h-4" /> Analytics
+                    </Link>
 
-                <div className="h-5 border-l border-slate-700 mx-1"></div>
-                
-                <button onClick={handleSignOut} className="flex items-center gap-1 text-sm font-medium text-red-400 hover:text-red-300">
-                  <LogOut className="h-4 w-4" /> Sign Out
-                </button>
-              </>
-            ) : user?.role === 'citizen' ? (
-              <>
-                <Link to="/citizen/home" className={`text-sm font-medium ${location.pathname === '/citizen/home' ? 'text-blue-700' : 'text-gray-600 hover:text-gray-900'}`}>Dashboard</Link>
-                <Link to="/citizen/report-grievance" className={`text-sm font-medium ${location.pathname === '/citizen/report-grievance' ? 'text-blue-700' : 'text-gray-600 hover:text-gray-900'}`}>Report Grievance</Link>
-                <Link to="/citizen/grievances" className={`text-sm font-medium ${location.pathname === '/citizen/grievances' ? 'text-blue-700' : 'text-gray-600 hover:text-gray-900'}`}>Track Status</Link>
-                <div className="h-6 border-l border-gray-300 mx-2"></div>
-                <Link to="/citizen/profile" className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-                  <User className="h-5 w-5" />
-                  <span>Profile</span>
-                </Link>
-                <button onClick={handleSignOut} className="flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-800 ml-4">
-                  <LogOut className="h-4 w-4" /> Sign Out
-                </button>
-              </>
-            ) : (
-              <Link to="/" className="text-sm font-medium text-gray-600 hover:text-gray-900">Home</Link>
-            )}
-          </nav>
+                    <div className="h-5 border-l border-slate-700 mx-1"></div>
+                    
+                    <button onClick={handleSignOut} className="flex items-center gap-1 text-sm font-medium text-red-400 hover:text-red-300">
+                      <LogOut className="h-4 w-4" /> Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <Link to="/" className="text-sm font-medium text-gray-600 hover:text-gray-900">Home</Link>
+                )}
+              </nav>
 
-          {/* Mobile menu button */}
-          <div className="flex items-center md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`${isHandlerRoute ? 'text-slate-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'} p-2`}
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+              {/* Mobile menu button */}
+              <div className="flex items-center md:hidden">
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className={`${isHandlerRoute ? 'text-slate-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'} p-2`}
+                >
+                  {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
       {/* Mobile Navigation */}
-      {isMenuOpen && (
+      {isMenuOpen && user?.role !== 'citizen' && (
         <div className={`md:hidden border-t ${isHandlerRoute ? 'border-slate-800 bg-slate-900' : 'border-gray-200 bg-white'}`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {user?.role === 'handler' ? (
@@ -139,14 +148,6 @@ const Header = () => {
                 <Link to="/handler/resolved" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-slate-800">Resolved</Link>
                 <Link to="/handler/priority-queue" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-slate-800">Analytics</Link>
                 <button onClick={handleSignOut} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-400 hover:bg-slate-800">Sign Out</button>
-              </>
-            ) : user?.role === 'citizen' ? (
-              <>
-                <Link to="/citizen/home" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-50">Dashboard</Link>
-                <Link to="/citizen/report-grievance" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-50">Report Grievance</Link>
-                <Link to="/citizen/grievances" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-50">Track Status</Link>
-                <Link to="/citizen/profile" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-50">Profile</Link>
-                <button onClick={handleSignOut} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50">Sign Out</button>
               </>
             ) : (
               <Link to="/" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-50">Home</Link>

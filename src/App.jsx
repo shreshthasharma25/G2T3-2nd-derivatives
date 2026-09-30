@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+import CitizenBottomNav from './components/layout/CitizenBottomNav';
 
 // Public
 import LandingPage from './pages/LandingPage';
@@ -37,6 +38,7 @@ const AppLayout = ({ children }) => (
       {children}
     </main>
     <Footer />
+    <CitizenBottomNav />
   </div>
 );
 
