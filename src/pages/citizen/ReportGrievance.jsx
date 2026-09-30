@@ -5,6 +5,8 @@ import { grievanceCategories } from '../../data/grievanceCategories';
 import { grievanceService } from '../../services/grievanceService';
 import { useAuth } from '../../contexts/AuthContext';
 import * as Icons from 'lucide-react';
+import LocationPicker from '../../components/common/LocationPicker';
+import { isValidPinCode, formatFullAddress } from '../../utils/locationHelpers';
 
 const ReportGrievance = () => {
   const navigate = useNavigate();
@@ -18,7 +20,16 @@ const ReportGrievance = () => {
     location: '',
     city: 'Kolkata',
     pinCode: '',
-    files: []
+    files: [],
+    houseNo: '',
+    street: '',
+    landmark: '',
+    state: 'West Bengal',
+    latitude: null,
+    longitude: null,
+    locationAccuracy: null,
+    locationSource: 'manual',
+    coordinates: null
   });
   
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -225,59 +236,11 @@ const ReportGrievance = () => {
             {/* Step 2: Location */}
             {step === 2 && (
               <div className="space-y-6 animate-in fade-in duration-300">
-                <h2 className="text-xl font-bold text-gray-900 mb-1">Where did it happen?</h2>
-                <p className="text-gray-500 text-sm mb-6">Provide the exact location so teams can find the issue.</p>
-                
                 <div>
-                  <label htmlFor="location" className="block text-sm font-semibold text-gray-700 mb-1">
-                    Locality / Area *
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <select
-                      name="location"
-                      id="location"
-                      required
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      className="block w-full rounded-md border border-gray-300 pl-10 px-4 py-3 focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white"
-                    >
-                      <option value="">Select an area in Kolkata</option>
-                      {kolkataAreas.map(area => (
-                        <option key={area} value={area}>{area}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-1">Where did it happen?</h2>
+                  <p className="text-gray-500 text-sm mb-6">Provide the exact location so teams can find the issue.</p>
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="city" className="block text-sm font-semibold text-gray-700 mb-1">City *</label>
-                    <input
-                      type="text"
-                      name="city"
-                      id="city"
-                      required
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      readOnly
-                      className="block w-full rounded-md border border-gray-300 px-4 py-3 bg-gray-50 text-gray-500 sm:text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="pinCode" className="block text-sm font-semibold text-gray-700 mb-1">PIN Code (Optional)</label>
-                    <input
-                      type="text"
-                      name="pinCode"
-                      id="pinCode"
-                      value={formData.pinCode}
-                      onChange={handleInputChange}
-                      className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
+                <LocationPicker formData={formData} setFormData={setFormData} />
               </div>
             )}
 
@@ -333,10 +296,23 @@ const ReportGrievance = () => {
                   </div>
                   <div className="pt-6 border-t border-gray-200">
                     <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Location</h3>
-                    <p className="mt-2 text-base text-gray-900 font-medium flex items-start">
-                      <MapPin className="h-5 w-5 text-gray-400 mr-2 shrink-0" />
-                      <span>{formData.location}, {formData.city} {formData.pinCode && `- ${formData.pinCode}`}</span>
-                    </p>
+                    <div className="mt-2 flex items-start">
+                      <MapPin className="h-5 w-5 text-gray-400 mr-2 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-base text-gray-900 font-medium">
+                          {formatFullAddress(formData)}
+                        </p>
+                        {formData.latitude != null && formData.longitude != null && (
+                          <div className="mt-1 flex items-center gap-1.5 text-xs text-blue-700 font-medium">
+                            <span className="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
+                            <span>{formData.locationSource === 'gps' ? 'GPS-verified pin' : 'Pin set on map'}</span>
+                            <span className="text-gray-400 font-normal">
+                              ({Number(formData.latitude).toFixed(4)}, {Number(formData.longitude).toFixed(4)})
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
@@ -366,7 +342,18 @@ const ReportGrievance = () => {
             {step < 4 ? (
               <button
                 type="submit"
-                disabled={step === 1 && (!formData.categoryId || !formData.title || !formData.description || !formData.severity) || (step === 2 && !formData.location)}
+                disabled={
+                  (step === 1 && (!formData.categoryId || !formData.title || !formData.description || !formData.severity)) ||
+                  (step === 2 && (
+                    !formData.location ||
+                    !formData.city ||
+                    !formData.city.trim() ||
+                    !formData.state ||
+                    !formData.state.trim() ||
+                    !isValidPinCode(formData.pinCode) ||
+                    !((formData.latitude != null && formData.longitude != null) || Boolean(formData.street && formData.street.trim()))
+                  ))
+                }
                 className="inline-flex justify-center py-2.5 px-8 border border-transparent shadow-sm text-sm font-bold rounded-md text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Continue
