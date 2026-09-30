@@ -55,8 +55,13 @@ const CitizenDashboard = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
-            {grievances.slice(0, 3).map((grievance) => {
+            <h2 className="text-xl font-bold text-gray-900">Recent Activity <span className="text-sm font-normal text-gray-500">({grievances.length})</span></h2>
+            <div className="max-h-[70vh] lg:max-h-[calc(100vh-16rem)] overflow-y-auto pr-2 p-1 space-y-6">
+            {[...grievances].sort((a, b) => {
+              const timeA = a.submittedAt ? new Date(a.submittedAt).getTime() : 0;
+              const timeB = b.submittedAt ? new Date(b.submittedAt).getTime() : 0;
+              return (Number.isNaN(timeB) ? 0 : timeB) - (Number.isNaN(timeA) ? 0 : timeA);
+            }).map((grievance) => {
               const category = grievanceCategories.find(c => c.id === grievance.categoryId);
               const statusInfo = grievanceStatuses[grievance.status] || grievanceStatuses.SUBMITTED;
               const IconComp = category && Icons[category.icon] ? Icons[category.icon] : Icons.FileQuestion;
@@ -90,6 +95,7 @@ const CitizenDashboard = () => {
                 </div>
               );
             })}
+            </div>
           </div>
           
           <div className="space-y-6">
