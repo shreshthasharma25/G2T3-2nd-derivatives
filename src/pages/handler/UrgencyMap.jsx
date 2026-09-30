@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { grievanceService } from '../../services/grievanceService';
 import { clusterGrievances, LOCALITY_COORDINATES } from '../../utils/problemClustering';
 import { AlertTriangle, Users, MapPin, Activity, ArrowRight, Layers, CheckCircle2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+
+const customStyles = `
+  .transparent-tooltip {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .transparent-tooltip::before {
+    display: none !important;
+  }
+`;
 
 const UrgencyMap = () => {
   const navigate = useNavigate();
@@ -30,6 +41,7 @@ const UrgencyMap = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col h-[calc(100vh-10rem)] min-h-[600px]">
+      <style>{customStyles}</style>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Kolkata Problem Clusters Map</h1>
@@ -91,6 +103,15 @@ const UrgencyMap = () => {
                       },
                     }}
                   >
+                    <Tooltip 
+                      direction="center" 
+                      permanent 
+                      className="transparent-tooltip text-white font-black text-sm p-0 m-0"
+                    >
+                      <span style={{ textShadow: '0px 0px 4px rgba(0,0,0,0.8)' }}>
+                        {cluster.reportsCount}
+                      </span>
+                    </Tooltip>
                     <Popup>
                       <div className="p-1">
                         <div className="text-[10px] font-bold uppercase text-red-600">
