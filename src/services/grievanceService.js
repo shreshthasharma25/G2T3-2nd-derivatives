@@ -45,6 +45,12 @@ export const grievanceService = {
     localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(grievances));
   },
 
+  deleteGrievance: (id) => {
+    const grievances = grievanceService.getAllGrievances();
+    const filtered = grievances.filter(g => g.id !== id);
+    grievanceService.saveAllGrievances(filtered);
+  },
+
   getGrievanceById: (id) => {
     const grievances = grievanceService.getAllGrievances();
     return grievances.find(g => g.id === id);

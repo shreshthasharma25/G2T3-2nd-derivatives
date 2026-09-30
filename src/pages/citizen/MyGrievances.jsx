@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, Clock, FileText } from 'lucide-react';
+import { Search, Filter, Clock, FileText, Trash2 } from 'lucide-react';
 import { grievanceService } from '../../services/grievanceService';
 import { grievanceCategories, grievanceStatuses } from '../../data/grievanceCategories';
 import { useAuth } from '../../contexts/AuthContext';
@@ -17,6 +17,15 @@ const MyGrievances = () => {
       setGrievances(grievanceService.getGrievancesForCitizen(user.id));
     }
   }, [user]);
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this complaint?")) {
+      grievanceService.deleteGrievance(id);
+      if (user) {
+        setGrievances(grievanceService.getGrievancesForCitizen(user.id));
+      }
+    }
+  };
 
   const filteredGrievances = grievances.filter(g => {
     const matchesSearch = g.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -127,9 +136,18 @@ const MyGrievances = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <Link to={`/citizen/grievance/${grievance.id}`} className="text-blue-700 hover:text-blue-900 font-bold bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-colors">
-                              View Details
-                            </Link>
+                            <div className="flex items-center justify-end gap-2">
+                              <Link to={`/citizen/grievance/${grievance.id}`} className="text-blue-700 hover:text-blue-900 font-bold bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 transition-colors">
+                                View Details
+                              </Link>
+                              <button 
+                                onClick={() => handleDelete(grievance.id)}
+                                className="text-red-600 hover:text-red-800 font-bold bg-red-50 p-1.5 rounded-md hover:bg-red-100 transition-colors"
+                                title="Delete Complaint"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
