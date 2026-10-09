@@ -1,54 +1,110 @@
 import { calculateUrgencyScore } from '../utils/urgencyScore';
-import { initialSeedGrievances } from '../data/seedGrievances';
 
 const GRIEVANCES_KEY = 'portal_grievances';
+const DEMO_CLEANED_KEY = 'portal_demo_data_purged_v1';
 
 export const grievanceService = {
   getAllGrievances: () => {
-    let data = localStorage.getItem(GRIEVANCES_KEY);
-    let grievances = [];
+    // If legacy demo data has not been purged from local storage, clean it once
+    if (!localStorage.getItem(DEMO_CLEANED_KEY)) {
+      localStorage.setItem(DEMO_CLEANED_KEY, 'true');
+      let existing = [];
+      try {
+        const raw = localStorage.getItem(GRIEVANCES_KEY);
+        existing = raw ? JSON.parse(raw) : [];
+      } catch {
+        existing = [];
+      }
+      // Purge any pre-populated demo complaints (IDs like GRV-2026-101... or citizenId CIT-10...)
+      const userOnly = Array.isArray(existing)
+        ? existing.filter(g => !g.id?.startsWith('GRV-2026-101') && !g.citizenId?.startsWith('CIT-10'))
+        : [];
+      localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(userOnly));
+      return userOnly;
+    }
 
-    // Auto-seed if empty or not set
+    const data = localStorage.getItem(GRIEVANCES_KEY);
     if (!data) {
-      grievances = [...initialSeedGrievances];
-      localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(grievances));
-      return grievances;
+      return [];
     }
 
     try {
-      grievances = JSON.parse(data) || [];
-      if (!Array.isArray(grievances) || grievances.length === 0) {
-        grievances = [...initialSeedGrievances];
-        localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(grievances));
-        return grievances;
+      const grievances = JSON.parse(data);
+      if (!Array.isArray(grievances)) {
+        return [];
       }
-    } catch {
-      grievances = [...initialSeedGrievances];
-      localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(grievances));
-      return grievances;
-    }
 
-    let modified = false;
-    grievances.forEach(g => {
-      if (g.status && g.status !== g.status.toUpperCase()) {
-        g.status = g.status.toUpperCase();
-        modified = true;
+      // Filter out any legacy demo records
+      const cleanGrievances = grievances.filter(
+        g => !g.id?.startsWith('GRV-2026-101') && !g.citizenId?.startsWith('CIT-10')
+      );
+
+      let modified = false;
+      cleanGrievances.forEach(g => {
+        if (g.status && g.status !== g.status.toUpperCase()) {
+          g.status = g.status.toUpperCase();
+          modified = true;
+        }
+      });
+      if (modified || cleanGrievances.length !== grievances.length) {
+        localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(cleanGrievances));
       }
-    });
-    if (modified) {
-      localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(grievances));
+      return cleanGrievances;
+    } catch {
+      return [];
     }
-    return grievances;
   },
 
   saveAllGrievances: (grievances) => {
-    localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(grievances));
+    localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(grievances || []));
   },
 
-  deleteGrievance: (id) => {
+  deleteGrievance: async (id, currentUser = null) => {
+    if (!id || typeof id !== 'string' || !id.trim()) {
+      throw new Error("Complaint ID is required and must be a valid string.");
+    }
+
+    const cleanId = id.trim();
     const grievances = grievanceService.getAllGrievances();
-    const filtered = grievances.filter(g => g.id !== id);
+    const target = grievances.find(g => g.id === cleanId);
+
+    if (!target) {
+      throw new Error(`Complaint with ID "${cleanId}" not found.`);
+    }
+
+    // Role-based authorization check
+    if (currentUser) {
+      const isHandlerOrAdmin = currentUser.role === 'handler' || currentUser.role === 'admin';
+      const isOwner = currentUser.role === 'citizen' && currentUser.id === target.citizenId;
+
+      if (!isHandlerOrAdmin && !isOwner) {
+        throw new Error("Unauthorized: Only authorized grievance handlers, administrators, or the original submitter can delete this complaint.");
+      }
+    }
+
+    // Permanently remove from local storage
+    const filtered = grievances.filter(g => g.id !== cleanId);
     grievanceService.saveAllGrievances(filtered);
+
+    // Synchronize deletion with FastAPI / Supabase backend if reachable
+    try {
+      await fetch(`http://localhost:8000/complaints/${encodeURIComponent(cleanId)}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-role': currentUser?.role || 'handler',
+          'x-user-id': currentUser?.id || '',
+        },
+      });
+    } catch {
+      // Backend service offline in dev environment; local state successfully updated
+    }
+
+    return {
+      success: true,
+      message: "Complaint deleted successfully.",
+      deletedId: cleanId,
+    };
   },
 
   getGrievanceById: (id) => {
@@ -86,6 +142,8 @@ export const grievanceService = {
       recurrence: similarComplaints > 0 ? 1 : 0
     });
 
+    const coordinates = data.coordinates || (data.latitude && data.longitude ? [Number(data.latitude), Number(data.longitude)] : null);
+
     const newGrievance = {
       ...data,
       id: `GRV-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
@@ -93,6 +151,7 @@ export const grievanceService = {
       citizenName: citizen?.name || 'Citizen Report',
       citizenEmail: citizen?.email || 'citizen@portal.gov',
       citizenMobile: citizen?.mobile || '',
+      coordinates,
       submittedAt: new Date().toISOString(),
       status: 'SUBMITTED',
       assignedDepartment: null,
@@ -122,7 +181,6 @@ export const grievanceService = {
     const index = grievances.findIndex(g => g.id === id);
     if (index !== -1) {
       const g = grievances[index];
-      const oldStatus = g.status;
       
       if (updateData.status) g.status = updateData.status;
       if (updateData.assignedDepartment) g.assignedDepartment = updateData.assignedDepartment;
@@ -219,10 +277,56 @@ export const grievanceService = {
     return updatedCount;
   },
 
-  // Helper to reset grievances to initial seed
+  // Export current grievances to CSV formatted for the analysis module
+  exportGrievancesAsCSV: () => {
+    const grievances = grievanceService.getAllGrievances();
+    if (!grievances || grievances.length === 0) return '';
+
+    const categoryMap = {
+      'roads': 'Road / Infrastructure',
+      'sanitation': 'Garbage / Waste',
+      'water': 'Water',
+      'drainage': 'Water',
+      'electricity': 'Electricity / Streetlight',
+      'street_lighting': 'Electricity / Streetlight',
+      'public_safety': 'Crime / Safety',
+      'transport': 'Road / Infrastructure',
+      'other': 'Other'
+    };
+
+    const deptMap = {
+      'Road / Infrastructure': 'Public Works Department',
+      'Garbage / Waste': 'Municipality',
+      'Water': 'Water Department',
+      'Electricity / Streetlight': 'Electricity Department',
+      'Crime / Safety': 'Police',
+      'Other': 'General Department'
+    };
+
+    const priorityMap = {
+      'Critical': 'High',
+      'High': 'High',
+      'Moderate': 'Medium',
+      'Low': 'Low'
+    };
+
+    const header = ['id', 'description', 'location', 'category', 'priority', 'department', 'status'];
+    const rows = grievances.map(g => {
+      const cat = categoryMap[g.categoryId] || 'Other';
+      const pri = priorityMap[g.severity] || 'Medium';
+      const dept = deptMap[cat] || 'General Department';
+      const status = g.status === 'RESOLVED' ? 'Resolved' : g.status === 'IN_PROGRESS' ? 'In Progress' : 'Submitted';
+      const desc = `"${(g.description || g.title || '').replace(/"/g, '""')}"`;
+      const loc = `"${(g.location || 'Unknown').replace(/"/g, '""')}"`;
+      return [g.id, desc, loc, `"${cat}"`, pri, `"${dept}"`, status].join(',');
+    });
+
+    return [header.join(','), ...rows].join('\n');
+  },
+
   resetToSeed: () => {
-    localStorage.setItem(GRIEVANCES_KEY, JSON.stringify(initialSeedGrievances));
-    return initialSeedGrievances;
+    localStorage.setItem(GRIEVANCES_KEY, JSON.stringify([]));
+    return [];
   },
 
   clearAllGrievances: () => {

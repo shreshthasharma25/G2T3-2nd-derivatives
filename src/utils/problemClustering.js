@@ -259,8 +259,9 @@ export function clusterGrievances(grievances = [], baseCoords = HANDLER_BASE_LOC
 
     priorityScore = Math.min(priorityScore, 100);
 
-    // Coords & Distance
-    const coordinates = LOCALITY_COORDINATES[c.location] || LOCALITY_COORDINATES['Other'];
+    // Coords & Distance - prioritize user's actual picked coordinates if available
+    const userCoords = c.reports.find((r) => r.coordinates && Array.isArray(r.coordinates))?.coordinates;
+    const coordinates = userCoords || LOCALITY_COORDINATES[c.location] || LOCALITY_COORDINATES['Other'];
     const distanceKm = calculateDistanceKm(baseCoords, coordinates);
 
     // Synthesized Title & Actions

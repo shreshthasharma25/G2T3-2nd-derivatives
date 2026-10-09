@@ -49,6 +49,14 @@ const LandingPage = () => {
                 Continue as Citizen
                 <ChevronRight className="ml-2 w-5 h-5" />
               </Link>
+              <div className="mt-3 text-center">
+                <Link 
+                  to="/citizen/register" 
+                  className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline"
+                >
+                  New citizen? Register an account
+                </Link>
+              </div>
             </div>
           </div>
 

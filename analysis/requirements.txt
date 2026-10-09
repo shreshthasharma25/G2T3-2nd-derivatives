@@ -1,0 +1,5 @@
+# Requirements for Citizen Grievance Data Analysis & Testing Module
+# YM - Data Analysis + Pattern Detection + Testing
+pandas>=2.0.0
+matplotlib>=3.7.0
+pytest>=7.0.0

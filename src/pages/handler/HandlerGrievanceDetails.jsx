@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, Clock, AlertTriangle, Users, Activity, ClipboardList } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, MapPin, Calendar, Clock, AlertTriangle, Users, Activity, ClipboardList, Trash2 } from 'lucide-react';
 import { grievanceService } from '../../services/grievanceService';
 import { grievanceCategories, grievanceStatuses } from '../../data/grievanceCategories';
+import { DeleteConfirmationModal } from '../../components/common/DeleteConfirmationModal';
 
 const HandlerGrievanceDetails = () => {
   const { id } = useParams();
@@ -66,6 +67,25 @@ const HandlerGrievanceDetails = () => {
       setUpdateMessage('');
       setSaving(false);
     }, 500);
+  };
+
+  const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+
+  const handleDeleteConfirm = async () => {
+    if (!grievance || isDeleting) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await grievanceService.deleteGrievance(grievance.id, { role: 'handler', id: 'HND-001' });
+      navigate('/handler/grievances');
+    } catch (err) {
+      setDeleteError(err?.message || 'Failed to delete complaint.');
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+    }
   };
 
   return (
@@ -190,13 +210,23 @@ const HandlerGrievanceDetails = () => {
                  ></textarea>
                </div>
 
-               <div className="mt-6 flex gap-3 border-t border-gray-100 pt-6">
+               <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-6">
                   <button 
                     onClick={handleUpdateStatus}
-                    disabled={saving}
+                    disabled={saving || isDeleting}
                     className="px-4 py-2 bg-slate-800 text-white rounded-md text-sm font-bold shadow-sm hover:bg-slate-900 disabled:opacity-50"
                   >
                     {saving ? 'Updating...' : 'Save & Notify'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    disabled={saving || isDeleting}
+                    className="px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-md text-sm font-bold shadow-sm transition-colors inline-flex items-center gap-1.5"
+                    title="Delete Complaint"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Complaint
                   </button>
                </div>
              </div>
@@ -259,6 +289,14 @@ const HandlerGrievanceDetails = () => {
         </div>
 
       </div>
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        complaint={grievance}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };

@@ -1,0 +1,26 @@
+id,description,location,category,priority,department,status,urgency_score,created_at,user_id
+CMP-2026-001,Potholes on main stretch causing severe vehicular damage and traffic slowdown,MG Road Ward 4,Road / Infrastructure,Medium,Public Works Department,In Progress,55,2026-09-21T09:15:00Z,USR-1001
+CMP-2026-002,Deep pothole near junction causing two-wheeler accidents and acute hazard,MG Road Ward 4,Road / Infrastructure,High,Public Works Department,Assigned,84,2026-09-22T10:30:00Z,USR-1002
+CMP-2026-003,Road divider broken and damaged road surface near metro pillar,MG Road Ward 4,Road / Infrastructure,Medium,Public Works Department,Submitted,52,2026-09-23T14:20:00Z,USR-1003
+CMP-2026-004,Footpath paving slabs are cracked and loose along the marketplace,MG Road Ward 4,Road / Infrastructure,Low,Public Works Department,Resolved,28,2026-09-20T11:00:00Z,USR-1004
+CMP-2026-005,Streetlight failure leaving the entire junction in complete darkness at night,Salt Lake Sector V,Electricity / Streetlight,Medium,Electricity Department,In Progress,68,2026-09-22T18:45:00Z,USR-1005
+CMP-2026-006,Broken streetlight pole with exposed wiring near pedestrian crossing,Salt Lake Sector V,Electricity / Streetlight,Medium,Electricity Department,Submitted,72,2026-09-23T08:15:00Z,USR-1006
+CMP-2026-007,Major waterlogging and submerged sidewalk after light rain due to choked drain,Salt Lake Sector V,Water,Medium,Water Department,Under Review,64,2026-09-24T12:00:00Z,USR-1007
+CMP-2026-008,Open sewer drain overflowing onto main road emitting foul stench,Salt Lake Sector V,Water,High,Water Department,In Progress,88,2026-09-24T16:30:00Z,USR-1008
+CMP-2026-009,Repeated streetlight blackout across 3rd Avenue for past four days,Salt Lake Sector V,Electricity / Streetlight,Medium,Electricity Department,Resolved,60,2026-09-21T20:10:00Z,USR-1009
+CMP-2026-010,Overflowing garbage bins with solid waste spilled across public pavement,Civil Lines Sector 2,Garbage / Waste,Medium,Municipality,Submitted,56,2026-09-23T07:45:00Z,USR-1010
+CMP-2026-011,Uncollected trash accumulation creating extreme stench and health hazard,Civil Lines Sector 2,Garbage / Waste,High,Municipality,Assigned,82,2026-09-24T09:20:00Z,USR-1011
+CMP-2026-012,Illegal dumping site formed beside residential park with animal carcass,Civil Lines Sector 2,Garbage / Waste,High,Municipality,In Progress,86,2026-09-24T13:15:00Z,USR-1012
+CMP-2026-013,Regular municipal dustbin missing from street corner citizens littering,Civil Lines Sector 2,Garbage / Waste,Low,Municipality,Resolved,24,2026-09-20T15:40:00Z,USR-1013
+CMP-2026-014,Live high-voltage wire snapped and hanging low risk of electrocution,Indira Nagar 5th Block,Electricity / Streetlight,High,Electricity Department,Submitted,95,2026-09-25T06:30:00Z,USR-1014
+CMP-2026-015,Sparking transformer with loud noise and smoke danger of fire,Indira Nagar 5th Block,Electricity / Streetlight,High,Electricity Department,In Progress,90,2026-09-25T07:15:00Z,USR-1015
+CMP-2026-016,Frequent voltage fluctuation causing household appliance damage,Indira Nagar 5th Block,Electricity / Streetlight,Medium,Electricity Department,Resolved,48,2026-09-22T17:50:00Z,USR-1016
+CMP-2026-017,Chain snatching incident and physical assault reported near alleyway,Park Street Central Zone,Crime / Safety,High,Police,Under Review,96,2026-09-24T21:10:00Z,USR-1017
+CMP-2026-018,Pickpocketing and aggressive harassment of pedestrians near night market,Park Street Central Zone,Crime / Safety,High,Police,In Progress,85,2026-09-25T19:30:00Z,USR-1018
+CMP-2026-019,Group involved in gambling den and illegal drug peddling behind bus shelter,Park Street Central Zone,Crime / Safety,High,Police,Assigned,88,2026-09-25T22:00:00Z,USR-1019
+CMP-2026-020,Main drinking water pipeline burst flooding the service lane,Nehru Place Block A,Water,High,Water Department,In Progress,82,2026-09-23T11:45:00Z,USR-1020
+CMP-2026-021,Contaminated tap water with brown muddy water supply for three days,Nehru Place Block A,Water,High,Water Department,Submitted,78,2026-09-24T08:00:00Z,USR-1021
+CMP-2026-022,Overgrown tree branches blocking street view and pedestrian walkway,Ballygunge Circular Road,Other,Low,General Department,Resolved,18,2026-09-21T10:00:00Z,USR-1022
+CMP-2026-023,Stray cattle herd blocking vehicular movement and causing public nuisance,Koramangala 4th Block,Other,Low,General Department,Submitted,22,2026-09-23T16:20:00Z,USR-1023
+CMP-2026-024,Broken park bench and damaged fountain in public recreational ground,Green Park Extension,Other,Low,General Department,Resolved,16,2026-09-22T14:00:00Z,USR-1024
+CMP-2026-025,Request for public signboards and civic guidance information board,Connaught Place Inner Circle,Other,Low,General Department,Submitted,14,2026-09-20T12:30:00Z,USR-1025

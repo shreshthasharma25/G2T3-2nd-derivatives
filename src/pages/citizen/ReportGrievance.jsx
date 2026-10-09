@@ -14,6 +14,7 @@ const ReportGrievance = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     categoryId: '',
+    subCategory: '',
     title: '',
     description: '',
     severity: '',
@@ -149,7 +150,7 @@ const ReportGrievance = () => {
                       return (
                         <div 
                           key={cat.id}
-                          onClick={() => setFormData({...formData, categoryId: cat.id})}
+                          onClick={() => setFormData({...formData, categoryId: cat.id, subCategory: ''})}
                           className={`
                             cursor-pointer border rounded-lg p-4 flex flex-col items-center text-center transition-all
                             ${formData.categoryId === cat.id ? 'border-blue-600 bg-blue-50 ring-1 ring-blue-600 shadow-sm' : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'}
@@ -165,6 +166,37 @@ const ReportGrievance = () => {
 
                 {formData.categoryId && (
                   <div className="space-y-6 pt-6 border-t border-gray-100 animate-in slide-in-from-top-4 duration-300">
+                    {(() => {
+                      const catObj = grievanceCategories.find(c => c.id === formData.categoryId);
+                      if (!catObj || !catObj.subCategories || catObj.subCategories.length === 0) return null;
+                      return (
+                        <div>
+                          <label htmlFor="subCategory" className="block text-sm font-semibold text-gray-700 mb-1">
+                            Specific Problem Type
+                          </label>
+                          <select
+                            id="subCategory"
+                            name="subCategory"
+                            value={formData.subCategory || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setFormData(prev => ({
+                                ...prev,
+                                subCategory: val,
+                                title: prev.title || (val && val !== 'Other' ? val : '')
+                              }));
+                            }}
+                            className="block w-full rounded-md border border-gray-300 px-4 py-2.5 focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white"
+                          >
+                            <option value="">Select specific issue type...</option>
+                            {catObj.subCategories.map(sub => (
+                              <option key={sub} value={sub}>{sub}</option>
+                            ))}
+                          </select>
+                        </div>
+                      );
+                    })()}
+
                     <div>
                       <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-1">
                         Short Title *
