@@ -45,3 +45,5 @@ The design focuses on accessibility, trustworthiness, and clarity, avoiding exag
 * This is a **frontend-only** implementation using mock data.
 * Authentication and form submissions are simulated.
 * Future work would involve connecting this frontend to a real backend API (e.g., Node.js/Express, Django) and a database to persist user accounts and grievances.
+
+Contribution note: Website development update by Yashvi.
